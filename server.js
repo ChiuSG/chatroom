@@ -9,8 +9,8 @@ app.use(cors());
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: '*',
+    methods: ['GET', 'POST']
   }
 });
 
@@ -226,7 +226,11 @@ const conversationState = {
 
 // 改進的回應生成系統
 function generateContextAwareResponse(speaker, topic, context) {
-  const topicData = conversationTopics.find(t => t.topic === topic.topic);
+  if (!topic) {
+    return '讓我們來聊聊天氣或美食吧！';
+  }
+  
+  const topicData = conversationTopics.find(t => t.topic === topic);
   if (!topicData) {
     return '讓我們來聊聊天氣或美食吧！';
   }
@@ -247,13 +251,13 @@ function generateContextAwareResponse(speaker, topic, context) {
   }
 
   // 如果檢測到新主題，切換到該主題
-  if (detectedTopic && detectedTopic !== topic.topic) {
+  if (detectedTopic && detectedTopic !== topic) {
     const newTopic = conversationTopics.find(t => t.topic === detectedTopic);
     if (newTopic) {
       // 使用新主題的起始語句
       const starterResponses = newTopic.starter[speaker.name];
-      conversationState.currentTopic = newTopic;
-      conversationState.topicStartTime = Date.now();
+      context.currentTopic = newTopic;
+      context.topicStartTime = Date.now();
       return starterResponses[Math.floor(Math.random() * starterResponses.length)];
     }
   }
@@ -424,7 +428,8 @@ function startAiConversation() {
 
     // 定期切換主題（每60秒）
     if (Date.now() - lastTopicChangeTime > 60000) {
-      const availableTopics = conversationTopics.filter(t => t.topic !== conversationState.currentTopic?.topic);
+      const currentTopicName = conversationState.currentTopic ? conversationState.currentTopic.topic : null;
+      const availableTopics = conversationTopics.filter(t => t.topic !== currentTopicName);
       if (availableTopics.length > 0) {
         conversationState.currentTopic = availableTopics[Math.floor(Math.random() * availableTopics.length)];
         lastTopicChangeTime = Date.now();
@@ -463,8 +468,8 @@ function startAiConversation() {
     lastSpeakers.add(speaker.name);
     
     // 生成回應
-    const messageText = generateContextAwareResponse(speaker, conversationState.currentTopic, conversationState);
-    
+    const topicValue = conversationState.currentTopic ? conversationState.currentTopic.topic : null;
+    const messageText = generateContextAwareResponse(speaker, topicValue, conversationState);
     const messageData = {
       id: Date.now().toString(),
       text: messageText,
@@ -473,7 +478,7 @@ function startAiConversation() {
       readBy: [],
       isAi: true,
       personality: speaker.personality,
-      topic: conversationState.currentTopic.topic
+      topic: topicValue
     };
 
     // 更新對話狀態
@@ -582,6 +587,6 @@ io.on('connection', (socket) => {
 startAiConversation();
 
 const PORT = process.env.PORT || 5002;
-server.listen(PORT, () => {
-  console.log(`伺服器運行在端口 ${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
 }); 
