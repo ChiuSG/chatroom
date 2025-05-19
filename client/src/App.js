@@ -4,18 +4,18 @@ import { CssBaseline, Container } from '@mui/material';
 import io from 'socket.io-client';
 
 function App() {
-  const socket = io(process.env.REACT_APP_API_URL || window.location.origin.replace(/:3000$/, ':5002'), {
+  const socket = io('http://localhost:5004', {
     transports: ['websocket', 'polling'],
-    cors: {
-      origin: '*',
-    }
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000
   });
 
   return (
     <>
       <CssBaseline />
       <Container>
-        <ChatRoom />
+        <ChatRoom socket={socket} />
       </Container>
     </>
   );

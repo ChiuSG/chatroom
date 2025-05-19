@@ -14,10 +14,10 @@ COPY . .
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 
-EXPOSE 5002
+EXPOSE 5004
 
 # 簡化健康檢查配置
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:5002 || exit 1
+    CMD curl -f http://localhost:5004 || exit 1
 
 CMD ["node", "server.js"] 

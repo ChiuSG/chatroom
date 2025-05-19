@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, Paper, Typography, List, ListItem, ListItemText, Chip } from '@mui/material';
-import io from 'socket.io-client';
 
-const socket = io('http://localhost:5002');
-
-function ChatRoom() {
+function ChatRoom({ socket }) {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState('');
   const [username, setUsername] = useState('');

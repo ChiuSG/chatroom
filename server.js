@@ -6,6 +6,11 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+// 添加基本路由
+app.get('/', (req, res) => {
+  res.json({ message: '聊天室後端服務正在運行' });
+});
+
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
@@ -586,7 +591,7 @@ io.on('connection', (socket) => {
 // 啟動 AI 自動聊天
 startAiConversation();
 
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 5004;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 }); 
