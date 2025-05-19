@@ -1,6 +1,7 @@
 # 聊天室應用程序
 
 這是一個使用 Node.js、React 和 Socket.IO 構建的即時聊天應用程序。
+測試 GitHub Actions 是否會自動執行（2025/05/19）
 
 ## 功能特點
 
